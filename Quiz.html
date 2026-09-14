@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>🎪 The Great Text-Decoding Circus 🎪</title>
+<style>
+  :root{
+    --ink:#2b2140; --muted:#7c7291; --line:#ece8f5;
+    --brand:#7c5cff; --pink:#ff6b9d; --mint:#22c9a8; --sun:#ffc93c;
+    --ok:#19b87a; --bad:#ff5470;
+  }
+  *{box-sizing:border-box}
+  body{font-family:"Segoe UI Emoji","Apple Color Emoji","Noto Color Emoji",
+    "Segoe UI Symbol",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,
+    "Helvetica Neue",Arial,sans-serif}
+  body{margin:0;padding:14px;color:var(--ink);
+    background:linear-gradient(160deg,#fdf4ff 0%,#eef3ff 45%,#eafff8 100%);
+    background-attachment:fixed;
+    font-size:16px;line-height:1.6;}
+  .wrap{max-width:720px;margin:0 auto;padding-bottom:24px}
+
+  header{text-align:center;margin:6px 0 18px}
+  h1{font-size:23px;margin:0 0 4px;letter-spacing:-.3px}
+  .sub{color:var(--muted);font-size:13.5px}
+  .badge{display:inline-block;margin-top:8px;background:var(--sun);color:#4a3600;
+    font-size:12px;font-weight:700;padding:4px 12px;border-radius:99px;transform:rotate(-2deg)}
+
+  h2{font-size:15px;margin:26px 0 12px;color:var(--brand);
+    display:flex;align-items:center;gap:8px}
+  h2::after{content:"";flex:1;height:2px;background:linear-gradient(90deg,var(--brand),transparent);border-radius:2px}
+
+  .q{background:#fff;border:2px solid var(--line);border-radius:18px;
+    padding:14px;margin-bottom:14px;box-shadow:0 4px 0 rgba(124,92,255,.10);
+    transition:transform .18s}
+  .q.mystery{border-color:var(--sun);box-shadow:0 4px 0 rgba(255,201,60,.25)}
+  .qhead{display:flex;gap:9px;align-items:center;margin-bottom:10px}
+  .num{flex:0 0 auto;width:28px;height:28px;border-radius:50%;
+    background:linear-gradient(135deg,var(--brand),var(--pink));
+    color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;
+    box-shadow:0 2px 6px rgba(124,92,255,.35)}
+  .stem{font-weight:700;font-size:14.5px}
+  .emo{font-size:17px;margin-left:auto}
+  .text{background:#fbfaff;border:2px dashed #ded6f5;border-radius:12px;
+    padding:10px 12px;margin:0 0 12px;font-size:14px;white-space:pre-line}
+
+  .opts{display:flex;flex-direction:column;gap:8px}
+  button.opt{width:100%;text-align:left;font:inherit;font-size:14px;color:var(--ink);
+    background:#fff;border:2px solid var(--line);border-radius:12px;padding:10px 12px;
+    cursor:pointer;display:flex;gap:10px;align-items:flex-start;transition:.15s}
+  button.opt:hover:not(:disabled){transform:translateX(3px);border-color:var(--brand)}
+  button.opt .k{font-weight:800;color:var(--brand);flex:0 0 auto}
+  button.opt.sel{border-color:var(--brand);background:#f0ecff;box-shadow:0 3px 0 var(--brand)}
+  button.opt.correct{background:#e3fbf1;border-color:var(--ok);color:#0d5b3c;animation:pop .35s}
+  button.opt.correct .k{color:var(--ok)}
+  button.opt.wrong{background:#ffeef1;border-color:var(--bad);color:#8c1330;animation:shake .35s}
+  button.opt.wrong .k{color:var(--bad)}
+  button.opt:disabled{cursor:default;transform:none}
+  @keyframes pop{0%{transform:scale(.96)}60%{transform:scale(1.03)}100%{transform:scale(1)}}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+  .fb{margin-top:10px;font-size:13.5px;border-radius:12px;padding:9px 12px;display:none}
+  .fb.show{display:block;animation:pop .3s}
+  .fb.good{background:#e3fbf1;color:#0d5b3c}
+  .fb.bad{background:#ffeef1;color:#8c1330}
+  .fb b{display:block;margin-bottom:2px}
+
+  .score{position:sticky;bottom:0;margin-top:18px;background:#fff;border:2px solid var(--line);
+    border-radius:18px;padding:12px;text-align:center;font-weight:700;
+    box-shadow:0 -4px 16px rgba(43,33,64,.10)}
+  .scLine{font-size:15px}
+  .big{font-size:20px;color:var(--brand)}
+  .bar{height:10px;background:var(--line);border-radius:99px;overflow:hidden;margin:8px 0 6px}
+  .bar>i{display:block;height:100%;width:0;border-radius:99px;
+    background:linear-gradient(90deg,var(--brand),var(--pink),var(--sun));transition:.35s}
+  .done{font-size:12.5px;color:var(--muted);font-weight:500}
+
+  #result{margin-top:20px;background:#fff;border:2px solid var(--line);border-radius:20px;
+    padding:16px;display:none;box-shadow:0 6px 0 rgba(124,92,255,.12)}
+  #result.show{display:block;animation:pop .4s}
+  .verdict{text-align:center;margin-bottom:14px}
+  .verdict .face{font-size:44px;display:block;animation:bounce 1s ease infinite}
+  @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+  .verdict .title{font-size:19px;font-weight:800;margin:4px 0 2px}
+  .verdict .quip{font-size:13.5px;color:var(--muted)}
+  #rsum{text-align:center;font-weight:700;margin-bottom:12px;font-size:14px}
+  table.res{width:100%;border-collapse:collapse;font-size:13.5px}
+  table.res th,table.res td{border-bottom:1px solid var(--line);padding:8px 5px;text-align:left;vertical-align:top}
+  table.res th{color:var(--muted);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+  table.res td.qn{width:28px;color:var(--muted);font-weight:700}
+  table.res .mk{width:24px;font-weight:800}
+  table.res .mk.y{color:var(--ok)}
+  table.res .mk.n{color:var(--bad)}
+  td.ua.n{color:var(--bad);font-weight:600}
+  td.ca{color:var(--ok);font-weight:600}
+  .emojifallback{display:inline-block;line-height:1}
+  .emojifallback:empty{display:none}
+  .snip{display:block;color:var(--muted);font-size:11.5px;margin-top:2px}
+  .again{margin-top:14px;width:100%;font:inherit;font-weight:700;font-size:14px;padding:12px;
+    border-radius:12px;border:none;color:#fff;cursor:pointer;
+    background:linear-gradient(135deg,var(--brand),var(--pink));box-shadow:0 4px 0 rgba(124,92,255,.35)}
+  .again:hover{filter:brightness(1.07)}
+  .again:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(124,92,255,.35)}
+
+  .confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:9}
+  .confetti span{position:absolute;top:-24px;font-size:20px;animation:fall linear forwards}
+  @keyframes fall{to{transform:translateY(105vh) rotate(540deg);opacity:.15}}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1><span class="emojifallback" data-alt="[ Circus ]">&#127912;</span> The Great Text-Decoding Circus <span class="emojifallback" data-alt="[ Circus ]">&#127912;</span></h1>
+  <div class="sub">12 tiny texts. One sneaky correct answer each. Can you outsmart a campsite notice?</div>
+  <div class="badge"><span class="emojifallback" data-alt="[ Lock ]">&#128274;</span> answers stay sealed until the very end</div>
+</header>
+
+<h2><span class="emojifallback" data-alt="*">&#127911;</span> Act I &mdash; What is this text actually saying?</h2>
+<div id="part1"></div>
+
+<h2><span class="emojifallback" data-alt="*">&#128269;</span> Act II &mdash; Which statement is the snitch-free truth?</h2>
+<div id="part2"></div>
+
+<div class="score">
+  <div class="scLine">Score: <span class="big" id="sc"><span class="emojifallback" data-alt="?">&#128302;</span> ?</span> <span style="color:var(--muted);font-weight:600">/ 12</span></div>
+  <div class="bar"><i id="bar"></i></div>
+  <div class="done" id="done">0 of 12 cracked &mdash; no peeking yet</div>
+</div>
+
+<div id="result">
+  <div class="verdict">
+    <span class="face" id="vface">🎉</span>
+    <div class="title" id="vtitle"></div>
+    <div class="quip" id="vquip"></div>
+  </div>
+  <div id="rsum"></div>
+  <table class="res">
+    <thead><tr><th class="qn">#</th><th class="mk"></th><th>You said</th><th>Truth</th><th>Text</th></tr></thead>
+    <tbody id="rbody"></tbody>
+  </table>
+  <button class="again" id="again">🎲 Shuffle my brain — play again</button>
+</div>
+</div>
+
+<script>
+const P1 = [
+  {
+    text:"Visit the home of famous kings and queens in history!\nEntrance $8.50 (children free)",
+    stem:"What does the notice say?",
+    emo:"👑",
+    opts:["There are two different ticket prices.","Children can enter without paying.","Teenagers pay the same price as adults."],
+    ans:1,
+    why:"“children free” — the two most beautiful words in the English language. Kids walk in, wallet stays shut."
+  },
+  {
+    text:"Jess,\nThere's a really good film at the cinema tonight. Tickets are $8 or $7 online. Shall I get two tickets?\nHannah",
+    stem:"What does Hannah say?",
+    emo:"🎬",
+    opts:["Hannah wants Jess to buy two tickets.","Hannah hopes that Jess will go to the cinema.","Hannah thinks they should buy their tickets online."],
+    ans:2,
+    why:"Hannah dangles $7 vs $8 like a bargain ninja. She's not asking Jess to buy — she's saying “let's click, not queue”."
+  },
+  {
+    text:"Greenhill Campsite\n• Quiet time between 10 p.m. and 7 a.m.\n• No ball games",
+    stem:"What does the notice say?",
+    emo:"🏕️",
+    opts:["You can play games if you are quiet.","There should be no loud noise during the night.","Greenhill Campsite is for quiet people."],
+    ans:1,
+    why:"10 p.m.–7 a.m. = the Great Silence. And ball games? Banned outright. Silent football is still football. 🥲"
+  },
+  {
+    text:"Tom,\nI can't go to judo club. Can you tell the teacher? I forgot to tell her I'm going on holiday for a week. Thanks!\nDaniel",
+    stem:"Why did Daniel write this message?",
+    emo:"🥋",
+    opts:["to let Tom know he's on holiday","to tell Tom he can't do judo for a week","to ask Tom to give their teacher a message"],
+    ans:2,
+    why:"The holiday is just the excuse. The actual mission: “Can you tell the teacher?” — Tom is now a human voicemail."
+  },
+  {
+    text:"Swimming pool – guests only\n9 a.m. – 7 p.m.\nChildren must be with adult",
+    stem:"What does the notice say?",
+    emo:"🏊",
+    opts:["Anyone can use the swimming pool.","Only adults can swim in the evening.","Children can swim when they're with an adult."],
+    ans:2,
+    why:"“guests only” slams the door on random passers-by, and small humans need a big human. No solo splashing."
+  },
+  {
+    text:"Camera – £15\nFive years old, but takes great photos\nNeeds new batteries\nCall Lily: 09767 366 635",
+    stem:"What does the advert say?",
+    emo:"📷",
+    opts:["Lily's camera works well.","Lily is selling a new camera.","Lily needs to buy some batteries."],
+    ans:2,
+    why:"Five years old = positively ancient in camera years. And it needs new batteries, so bring snacks… I mean, batteries. 🔋"
+  }
+];
+
+const P2 = [
+  {
+    text:"Special Offer!\nBuy two get one free.\nThis is only available at the weekend",
+    stem:"Which statement is true?",
+    emo:"🛒",
+    opts:["There are special offers every day at this shop.","You don't have to pay for the third item.","This offer is only available on Saturday."],
+    ans:1,
+    why:"Buy two, get one free — item #3 is on the house. And “the weekend” means Saturday AND Sunday, don't let them shrink it."
+  },
+  {
+    text:"Subject: Meeting Today\nHi, Jack,\nPlease note that the meeting will start this evening at seven o'clock. Make sure you bring your computer as I'm not going tonight.\nRegards,\nWill",
+    stem:"Which statement is true?",
+    emo:"💼",
+    opts:["Will wanted to remind Jack about the time for the meeting.","Jack doesn't need to bring anything to the meeting.","Jack and Will are both going to the meeting in the evening."],
+    ans:0,
+    why:"Jack must lug his laptop. Will? Smoothly absent. Classic. 😎 The point of the email is the 7 o'clock reminder."
+  },
+  {
+    text:"Left Luggage\nWe are open at 7 am and close at 11pm.\nSmall Bag £5\nLarge Bag £10",
+    stem:"Which statement is true?",
+    emo:"🧳",
+    opts:["You can only leave small bags at this place.","They charge more for larger bags than smaller bags.","You can leave your bag anytime of the day."],
+    ans:1,
+    why:"Big bag = £10, small bag = £5. Size is expensive. And 11pm closing means your 3am bag is on its own."
+  },
+  {
+    text:"Hi Josh,\nI've booked the cinema tickets for both for us online, Can you give the money this evening when I see you?\nHarry",
+    stem:"Which statement is true?",
+    emo:"🍿",
+    opts:["Harry wants to know if Josh can pay him back today.","Harry hopes that Josh will be able to come with him.","Harry thinks Josh should look on the cinema website."],
+    ans:0,
+    why:"Tickets? Already booked. Money? Wanted this evening. Harry is a friendly loan shark with good taste in films."
+  },
+  {
+    text:"For Sale\nSkateboard (Beginner)\n6 months old – need new wheels\nPhone Eric – 088282727",
+    stem:"Which statement is true?",
+    emo:"🛹",
+    opts:["Eric is selling it because it is 6 months old.","Some parts of the skateboard must be changed.","The skateboard is for someone who is good at this sport."],
+    ans:1,
+    why:"“need new wheels” = the wheels are toast. And “Beginner” means it's for wobbly knees, not Tony Hawk."
+  },
+  {
+    text:"Wildlife Safari Park\nOpen March to November\nClick here for more info",
+    stem:"Which statement is true?",
+    emo:"🦁",
+    opts:["You can get more information about the park by giving them a call.","The Wildlife Safari Park is open all year round.","You can go to the Safari Wildlife Park in the Summer Holidays."],
+    ans:2,
+    why:"March–November covers the summer holidays nicely ❄️🐧 is not on the menu. Info is online (“Click here”), not by phone."
+  }
+];
+
+const KEYS = ["A","B","C"];
+const ALL = P1.concat(P2);
+const TOTAL = 12;
+let answered = 0, correct = 0, locked = false;
+const picked = new Array(TOTAL).fill(null);
+
+const NUDGE = [
+  "0 of 12 cracked — no peeking yet 👀",
+  "1 down, 11 to go — the texts are getting nervous 😏",
+  "2 done! Momentum: achieved 🏃",
+  "3 in. You're basically a notice-reading machine 🤖",
+  "4 — halfway to snack o'clock 🍪",
+  "5! The campsite notice never saw you coming 🏕️",
+  "6 — HALFWAY. Stretch. Blink. Continue 🧘",
+  "7 down. Only 5 tiny texts stand between you and glory ⚔️",
+  "8 — are you secretly the teacher? 🕵️",
+  "9! The finish line can smell you 🏁",
+  "10 — one more text is trembling 😱",
+  "11… the LAST one. Don't choke now 🥁"
+];
+
+function esc(s){ return String(s).replace(/</g,"&lt;"); }
+
+function build(list, host, offset){
+  host.innerHTML = list.map((q,i)=>`
+    <div class="q mystery" id="q${offset+i}">
+      <div class="qhead">
+        <div class="num">${offset+i+1}</div>
+        <div class="stem">${q.stem}</div>
+        <div class="emo">${q.emo}</div>
+      </div>
+      <div class="text">${esc(q.text)}</div>
+      <div class="opts">
+        ${q.opts.map((o,j)=>`<button class="opt" data-j="${j}"><span class="k">${KEYS[j]}.</span><span>${esc(o)}</span></button>`).join("")}
+      </div>
+      <div class="fb"></div>
+    </div>`).join("");
+
+  host.querySelectorAll(".q").forEach((el,idx)=>{
+    el.querySelectorAll(".opt").forEach(btn=>{
+      btn.addEventListener("click",()=>{
+        if(locked) return;
+        el.querySelectorAll(".opt").forEach(b=>b.classList.remove("sel"));
+        btn.classList.add("sel");
+        picked[offset+idx] = +btn.dataset.j;
+        updateProgress();
+      });
+    });
+  });
+}
+
+function updateProgress(){
+  answered = picked.filter(p=>p!==null).length;
+  document.getElementById("bar").style.width = (answered/TOTAL*100) + "%";
+  document.getElementById("done").textContent =
+    answered < TOTAL ? NUDGE[answered] : "All 12 in! Cracking the seal… 🔓";
+  if(answered === TOTAL){
+    locked = true;
+    setTimeout(()=>{ markAll(); showResult(); }, 500);
+  }
+}
+
+function markAll(){
+  correct = 0;
+  document.querySelectorAll(".q").forEach((el,i)=>{
+    el.classList.remove("mystery");
+    const q = ALL[i], p = picked[i], ok = p === q.ans;
+    if(ok) correct++;
+    const btns = el.querySelectorAll(".opt");
+    btns.forEach(b=>{ b.disabled = true; b.classList.remove("sel"); });
+    btns[p].classList.add(ok ? "correct" : "wrong");
+    if(!ok) btns[q.ans].classList.add("correct");
+    const fb = el.querySelector(".fb");
+    fb.className = "fb show " + (ok ? "good" : "bad");
+    fb.innerHTML = `<b>${ok ? "🎉 Nailed it — " + KEYS[q.ans] : "🙈 Oof — it was " + KEYS[q.ans]}</b>${q.why}`;
+  });
+  document.getElementById("sc").textContent = correct;
+  document.getElementById("done").textContent = "All 12 answered — seal broken!";
+}
+
+function verdict(n){
+  if(n === 12) return ["🏆","Flawless. Suspiciously flawless.","12/12 — Either you're a genius or you peeked. We'll never know. (We believe you.)"];
+  if(n >= 10) return ["🌟","Certified Text Whisperer",`${n}/12 — You read notices like a hawk on espresso. Almost perfect!`];
+  if(n >= 8)  return ["😎","Solidly Brilliant",`${n}/12 — A couple of tricky texts got you. Shake it off, champion.`];
+  if(n >= 6)  return ["🙂","Respectably Human",`${n}/12 — Half right, half… creatively interpreted. Progress!`];
+  if(n >= 4)  return ["🌱","Brave Attempt",`${n}/12 — The texts fought dirty. You fought dirty back. Almost worked.`];
+  if(n >= 1)  return ["🐣","Lots of Room to Grow",`${n}/12 — Hey, at least you showed up. That's 90% of literacy.`];
+  return ["🫠","The Texts Have Won","0/12 — Statistically impressive, actually. Try guessing the opposite of every instinct."];
+}
+
+function confetti(){
+  const box = document.createElement("div");
+  box.className = "confetti";
+  const e = ["🎉","🎊","✨","🎈","⭐","🍾","🎯"];
+  for(let i=0;i<34;i++){
+    const s = document.createElement("span");
+    s.textContent = e[i % e.length];
+    s.style.left = Math.random()*100 + "%";
+    s.style.animationDuration = (2 + Math.random()*1.8) + "s";
+    s.style.animationDelay = (Math.random()*.7) + "s";
+    box.appendChild(s);
+  }
+  document.body.appendChild(box);
+  setTimeout(()=>box.remove(), 4200);
+}
+
+function showResult(){
+  const [face,title,quip] = verdict(correct);
+  document.getElementById("vface").textContent = face;
+  document.getElementById("vtitle").textContent = title;
+  document.getElementById("vquip").textContent = quip;
+  document.getElementById("rsum").textContent = `You scored ${correct} out of ${TOTAL}`;
+
+  document.getElementById("rbody").innerHTML = ALL.map((q,i)=>{
+    const p = picked[i], ok = p === q.ans;
+    const lines = q.text.split("\n");
+    const snip = esc(lines[0]).slice(0,40) + (lines.length > 1 ? "…" : "");
+    return `<tr>
+      <td class="qn">${i+1}</td>
+      <td class="mk ${ok?"y":"n"}">${p===null?"–":(ok?"✓":"✗")}</td>
+      <td class="ua ${p===null||ok?"":"n"}">${p===null?"—":KEYS[p]+". "+esc(q.opts[p])}</td>
+      <td class="ca">${KEYS[q.ans]}. ${esc(q.opts[q.ans])}</td>
+      <td>${q.emo} <span class="snip">${snip}</span></td>
+    </tr>`;
+  }).join("");
+
+  const box = document.getElementById("result");
+  box.classList.add("show");
+  if(correct >= 8) confetti();
+  setTimeout(()=>box.scrollIntoView({behavior:"smooth", block:"start"}), 250);
+}
+
+document.getElementById("again").addEventListener("click", ()=>{
+  picked.fill(null); answered = 0; correct = 0; locked = false;
+  document.querySelectorAll(".q").forEach(el=>{
+    el.classList.add("mystery");
+    el.querySelectorAll(".opt").forEach(b=>{ b.disabled=false; b.className="opt"; });
+    el.querySelector(".fb").className = "fb";
+  });
+  document.getElementById("result").classList.remove("show");
+  document.getElementById("sc").textContent = "🔮 ?";
+  document.getElementById("bar").style.width = "0%";
+  document.getElementById("done").textContent = NUDGE[0];
+  window.scrollTo({top:0, behavior:"smooth"});
+});
+
+build(P1, document.getElementById("part1"), 0);
+build(P2, document.getElementById("part2"), 6);
+
+/* Emoji fallback: if the system can't render a glyph, show its text label
+   instead of a blank box. Runs after the DOM is built. */
+(function(){
+  function isRenderable(ch){
+    const span = document.createElement("span");
+    span.style.position = "absolute";
+    span.style.left = "-9999px";
+    span.style.fontSize = "20px";
+    span.textContent = ch;
+    document.body.appendChild(span);
+    const w = span.getBoundingClientRect().width;
+    document.body.removeChild(span);
+    return w > 0;
+  }
+  // collect every distinct emoji-ish char from the document
+  const set = new Set();
+  (document.body.innerText || "").replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{1F1E6}-\u{1F1FF}\u{1F300}-\u{1F5FF}]/gu, function(m){ set.add(m); });
+  const unsupported = new Set();
+  set.forEach(function(c){ if(!isRenderable(c)) unsupported.add(c); });
+  if(unsupported.size){
+    document.querySelectorAll(".emojifallback").forEach(function(el){
+      el.textContent = el.getAttribute("data-alt") || "";
+    });
+    // also swap inline emoji chars inside generated options/texts
+    const walk = function(node){
+      if(node.nodeType === 3){
+        const repl = node.textContent.replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{1F300}-\u{1F5FF}]/gu, "");
+        if(repl !== node.textContent) node.textContent = repl;
+      } else if(node.nodeType === 1){
+        node.childNodes.forEach(walk);
+      }
+    };
+    walk(document.body);
+  }
+})();
+</script>
+</body>
+</html>
